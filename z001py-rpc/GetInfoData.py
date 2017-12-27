@@ -11,8 +11,9 @@ web3 = Web3(HTTPProvider('http://localhost:8545'))
 
 def howToUse():
     print("--- how to use ---")
-    print("1. ID infomation: python3 CheckCurrentIDState.py 1 \"ID Space's key (64bit)\"")
-    sys.exit(result)
+    print("1. ID information: python3 CheckStateOfBC.py 1 \"ID Space's key (120bit)\"")
+    print("2. Default Account Information: python3 CheckStateOfBC.py 2")
+    sys.exit()
 
 # creating contract object
 f = open("../build/contracts/RangedIDRegistrar.json")
@@ -33,13 +34,20 @@ if (len(sys.argv) < 2):
     howToUse()
     
 instr = sys.argv[1] 
-IDKey = sys.argv[2] 
 
 if (instr == "1" and len(sys.argv) == 3):
+    IDKey = sys.argv[2] 
     addr = contract.call({'from': defaultAccount}).getAddr(int(IDKey, 16))
     timestamp = contract.call({'from': defaultAccount}).getTimestamp(int(IDKey, 16))
     print("--- ID Space's key: " + IDKey + " ---");
     print("owner: " + addr.capitalize());
-    print("timestamp: " + str(int(timestamp, 16)));    
+    print("timestamp: " + str(timestamp));
+elif (instr == "2" and len(sys.argv) == 2):
+    hashData = contract.call({'from': defaultAccount}).getPreOrderHash(defaultAccount)
+    blockHeight = contract.call({'from': defaultAccount}).getPreOrderBlockHeight(defaultAccount)
+    print("--- Default Account User Info ---");
+    print("pre-order hash: " + web3.toHex(hashData))
+    print("pre-order blockHeight: " + str(blockHeight))
+    
 else:
     howToUse()

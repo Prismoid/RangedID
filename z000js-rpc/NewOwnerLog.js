@@ -23,8 +23,8 @@ if (tgtAnt === "Local" && locNum < web3.eth.accounts.length) {
     flag = 2;
 } else {
     console.log("--- How to use ---");
-    console.log("1. node InstrLog.js Local i (local account number)");
-    console.log("2. node InstrLog.js \"0xcd669c440a31f6f54a0fa583abf76fd2badeede7\"");
+    console.log("1. node NewOwnerLog.js Local i (local account number)");
+    console.log("2. node NewOwnerLog.js \"0xcd669c440a31f6f54a0fa583abf76fd2badeede7\"");
     return false;
 }   
 
@@ -35,8 +35,8 @@ if (flag == 1) {
     console.log("--- Following ID Sapces belong to owner( " + tgtAnt + " ) ---");
 } else {
     console.log("--- How to use ---");
-    console.log("1. node InstrLog.js Local i (local account number)");
-    console.log("2. node InstrLog.js \"0xcd669c440a31f6f54a0fa583abf76fd2badeede7\"");
+    console.log("1. node NewOwnerLog.js Local i (local account number)");
+    console.log("2. node NewOwnerLog.js \"0xcd669c440a31f6f54a0fa583abf76fd2badeede7\"");
     return false;
 }
 

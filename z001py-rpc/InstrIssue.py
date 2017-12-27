@@ -11,7 +11,8 @@ web3 = Web3(HTTPProvider('http://localhost:8545'))
 def howToUse(result):
     print("--- how to use ---")
     print("1. increment: python3 InstrIssue.py 1")
-    print("2. pow: python3 InstrIssue.py 2 \"target ID Space's key(64bit)\" \"password\"")
+    print("2. pre-order1: python3 InstrIssue.py 2 \"target ID Space's key(64bit)\" \"nonce\"")
+    print("3. pre-order2: python3 InstrIssue.py 3 \"target ID Space's key(64bit)\" \"nonce\"")
     sys.exit(result)
 
 # creating contract object
@@ -49,53 +50,30 @@ if (instr == "1" and len(sys.argv) == 2):
         import traceback
         traceback.print_exc()
 elif (instr == "2" and len(sys.argv) == 4):
-    password = sys.argv[3]
-    if (not (web3.personal.unlockAccount(defaultAccount, password, 1))):
-        print("This password will fail to unlock, so this programm stops")
-        howToUse(-2)
-    try:
-        # steady variable
-        inputKey = int(sys.argv[2], 16)
-        tgt      = contract.call({'from': defaultAccount}).tgt()
-        print(hex(tgt))
-        # not steady variable
-        curBlockNum = web3.eth.blockNumber
-        powBlock = web3.eth.getBlock((curBlockNum - 1 - 12)) # need 12 confirmations
-        curHash  = powBlock.hash
-        nonce    = 0
-        # flag
-        finFlag  = 0
-        while (True):
-            if (curBlockNum < web3.eth.blockNumber):
-                curBlockNum = web3.eth.blockNumber
-                powBlock = web3.eth.getBlock((curBlockNum - 1 - 12)) # need 12 confirmations
-                curHash  = powBlock.hash
-                print(curHash)
-                nonce = 0
-            for i in range(1000000):
-                if (int(web3.soliditySha3(['uint64', 'bytes32', 'address', 'uint64'], [inputKey, curHash, defaultAccount, nonce]), 16) <= tgt):
-                    finFlag = 1
-                    print("hey")
-                    print(tgt)
-                    break
-                nonce += 1
-            if (finFlag == 1):
-                break
-        print("--- PoW success ---")
-        print(web3.soliditySha3(['uint64', 'bytes32', 'address', 'uint64'], [inputKey, curHash, defaultAccount, nonce]))
+    key = sys.argv[2] # 120 bit strings
+    nonce = sys.argv[3]
+    timestamp = contract.call({'from': defaultAccount}).getTimestamp(int(key, 16))
+    print("pre-order Hash: " + web3.soliditySha3(['uint64', 'uint64'], [int(key, 16), int(nonce, 16)]))    
+    result = contract.call({'from': defaultAccount}).preOrderReg1(web3.toBytes(hexstr=web3.soliditySha3(['uint64', 'uint64'], [int(key, 16), int(nonce, 16)])))
+    if (result > 0):
+        result = contract.transact({'from': defaultAccount}).preOrderReg1(web3.toBytes(hexstr=web3.soliditySha3(['uint64', 'uint64'], [int(key, 16), int(nonce, 16)])))
+        print("Sending pre-order1 Tx")
+        print("Tx Hash: " + result)
 
-
-        web3.personal.unlockAccount(defaultAccount, password, 300)
-        result = contract.call({'from': defaultAccount}).powReg(inputKey, curBlockNum - 13, defaultAccount, nonce)
-        if (result > 0):
-            result = contract.transact({'from': defaultAccount}).powReg(inputKey, curBlockNum - 13, defaultAccount, nonce)
-            print("Sending PoW Tx")
-            print("Tx Hash: " + result)
-        else:
+    else:
             print("This Tx will not be verified under this condition")
             howToUse(result)
-    except:
-        import traceback
-        traceback.print_exc()
+elif (instr == "3" and len(sys.argv) == 4):
+    key = sys.argv[2] # 120 bit strings
+    nonce = sys.argv[3]
+    result = contract.call({'from': defaultAccount}).preOrderReg2(int(key, 16), int(nonce, 16))
+    if (result > 0):
+        result = contract.transact({'from': defaultAccount, 'gas': 4500000}).preOrderReg2(int(key, 16), int(nonce, 16))
+        print("Sending pre-order2 Tx")
+        print("Tx Hash: " + result)
+
+    else:
+            print("This Tx will not be verified under this condition")
+            howToUse(result)
 else:
     howToUse(-3)

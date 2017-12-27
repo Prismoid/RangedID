@@ -10,11 +10,7 @@ contract RangedIDRegistrar {
   uint16 public incrTLDc; // [0x1000, 0x10ff]
   uint40 public incrIndex;
 
-  uint16 public powTLDc; // [0x1100, 0x11ff]
-  uint32  public diff; // the PoW success pobablity = 1/2
-  uint256 public tgt;
-  uint40 public powCnt;
-
+  
   // events
   event NewOwner(uint120 key, address owner);
   event TransferRight(uint120 key, address owner);
